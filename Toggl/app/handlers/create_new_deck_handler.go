@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 	"toggl/app/dtos"
 
 	"github.com/sirupsen/logrus"
@@ -13,7 +14,7 @@ func (d *DeckHandlerImpl) CreateNewDeckHandler(w http.ResponseWriter, r *http.Re
 
 	query := r.URL.Query()
 	shuffle := query.Get("shuffle") == "true"
-	cards := query.Get("cards")
+	cards := strings.TrimSpace(query.Get("cards"))
 	deck, err := d.deckservice.CreateNewDeck(shuffle, cards)
 	if err != nil {
 		d.logger.WithError(err).Error("Error creating new deck")

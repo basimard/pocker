@@ -215,7 +215,7 @@ func (r *Repository) CheckDeckExist(deckId string) (bool, error) {
 	var exist bool
 	err = db.QueryRow(deckQuery, deckId).Scan(&exist)
 	if err != nil {
-		r.logger.Errorf("Error %s in querying %s with param %s", err, deckQuery, deckId)
+		r.logger.Error("Error %s in querying %s with param %s", err, deckQuery, deckId)
 		return false, err
 	}
 

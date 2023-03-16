@@ -1,7 +1,7 @@
 package services
 
 import (
-	"fmt"
+	"errors"
 	"math/rand"
 	"strings"
 	"time"
@@ -33,9 +33,10 @@ func NewDeckService(logger *logrus.Logger, repo *repos.Repository) *DeckServiceI
 }
 
 // parse cards and validate for creating deck
-func parseCode(code string) (models.Card, error) {
+func parseCode(code string, logger *logrus.Logger) (*models.Card, error) {
 	if len(code) != 2 {
-		return models.Card{}, fmt.Errorf("%s is not a valid code: must be exactly two letters", code)
+		logger.Error("Invalid card")
+		return nil, errors.New("Invalid card")
 	}
 
 	value := ""
@@ -47,7 +48,8 @@ func parseCode(code string) (models.Card, error) {
 	}
 
 	if value == "" {
-		return models.Card{}, fmt.Errorf("%s is not a valid code: unknown value %s", code, code[0])
+		logger.Error("Invalid value")
+		return nil, errors.New("Invalid value")
 	}
 
 	suit := ""
@@ -59,10 +61,11 @@ func parseCode(code string) (models.Card, error) {
 	}
 
 	if suit == "" {
-		return models.Card{}, fmt.Errorf("%s is not a valid code: unknown suit %s", code, code[1])
+		logger.Error("Invalid suit")
+		return nil, errors.New("Invalid suit")
 	}
 
-	return models.Card{Value: value, Suit: suit, Code: code}, nil
+	return &models.Card{Value: value, Suit: suit, Code: code}, nil
 }
 
 func contains(arr []string, str string) bool {
@@ -97,16 +100,16 @@ func (s *DeckServiceImpl) CreateNewDeck(shuffled bool, cards string) (*dtos.Resp
 	if len(lstCards) != 1 && lstCards[0] != "" {
 
 		if len(lstCards) > 52 {
-			s.logger.Errorf("Number of cards exceeded")
+			s.logger.Error("Number of cards exceeded")
 		}
 		for _, code := range lstCards {
-			parsedCard, err := parseCode(code)
+			parsedCard, err := parseCode(code, s.logger)
 			if err != nil {
-				s.logger.Errorf("%s is not a valid code\n", code)
-				continue
+				s.logger.Error("%s is not a valid code\n", code)
+				return nil, err
 			}
 
-			deckCards = append(deckCards, parsedCard)
+			deckCards = append(deckCards, *parsedCard)
 		}
 
 	} else {
@@ -126,7 +129,10 @@ func (s *DeckServiceImpl) CreateNewDeck(shuffled bool, cards string) (*dtos.Resp
 		Cards:     deckCards,
 	}
 
-	var result, _ = s.repo.CreateDeck(deck)
+	result, err := s.repo.CreateDeck(deck)
+	if err != nil {
+		s.logger.WithError(err).Error("Error in creating deck")
+	}
 
 	var resp = dtos.RespCreateDeck{DeckID: result, Remaining: deck.Remaining, Shuffled: deck.Shuffled}
 
@@ -142,7 +148,7 @@ func (s *DeckServiceImpl) OpenDeck(deckId string) (*dtos.RespOpenDeck, error) {
 	}
 	if !exist {
 		s.logger.Errorf("Deck with id %s does not exist", deckId)
-		return nil, err
+		return nil, errors.New("Id doesn't exist")
 	}
 
 	deck, err := s.repo.OpenDeck(deckId)
@@ -163,7 +169,7 @@ func (s *DeckServiceImpl) DrawCard(deckId string, count int) (*dtos.RespDrawDeck
 	}
 	if !exist {
 		s.logger.Errorf("Deck with id %s does not exist", deckId)
-		return nil, err
+		return nil, errors.New("Id doesn't exist")
 	}
 
 	// Check if count is less than remaining cards
@@ -174,7 +180,7 @@ func (s *DeckServiceImpl) DrawCard(deckId string, count int) (*dtos.RespDrawDeck
 	remaining := len(deck.Cards)
 	if count > remaining {
 		s.logger.Errorf("Requested count %d exceeds remaining cards %d in deck", count, remaining)
-		return nil, err
+		return nil, errors.New("Requested count exceeds remaining cards in deck")
 	}
 
 	// Draw cards
