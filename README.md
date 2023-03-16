@@ -1,7 +1,7 @@
 
 ## API Reference
 
-#### Get all items
+#### Create a new deck
 
 ```http
   POST /v1/create-deck?${shuffle}&{cards}
@@ -12,7 +12,7 @@
 | `shuffle` | `string` | `true or false` |
 | `cards` | `string` | `AS,2S` |
 
-#### Get item
+#### Open a deck
 
 ```http
   GET /v1/open-deck/${deck_id}
@@ -22,7 +22,7 @@
 | :-------- | :------- | :-------------------------------- |
 | `deck_id`      | `string` | `uuid deck id` |
 
-
+#### Draw cards from deck
 ```http
   POST /v1/draw-cards/${deck_id}&${count}
 ```
