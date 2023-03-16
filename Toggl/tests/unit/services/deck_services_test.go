@@ -102,3 +102,28 @@ func TestCheckIfCreateNewDeckReturnValidRemainingForGivenCards(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, deck.Remaining, expectedCount)
 }
+
+func TestCheckIfCreateNewDeckReturnValidRemainingForGivenCards(t *testing.T) {
+
+	var sample = "AS,2S"
+	var expectedCount = 2
+	// Create a new logger
+	logger := logrus.New()
+
+	// Create a new repository in test mode
+	repo := repos.NewRepository(logger, true)
+
+	// Create a new deck service using the repository
+	service := services.NewDeckService(logger, repo)
+
+	// Call the CreateNewDeck method with false for shuffle and an empty string for deckID
+	deck, err := service.CreateNewDeck(false, sample)
+
+	// Ensure that no error was returned
+	assert.NoError(t, err)
+
+	// Parse the UUID and ensure that it is valid
+
+	assert.NoError(t, err)
+	assert.Equal(t, deck.Remaining, expectedCount)
+}
