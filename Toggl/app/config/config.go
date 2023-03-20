@@ -7,20 +7,30 @@ import (
 )
 
 type Config struct {
-	Port    int
-	Timeout int
-	// Add more configuration fields here
+	Port     int
+	Timeout  int
+	Database Database
 }
 
-func LoadConfig() (*Config, error) {
+type Database struct {
+	TestPath string
+	ProdPath string
+}
+
+func LoadConfig(isTest bool) (*Config, error) {
 	// Set the default values for configuration fields
-	viper.SetDefault("port", 8080)
-	viper.SetDefault("timeout", 30)
+	viper.SetDefault("Port", 8080)
+	viper.SetDefault("Timeout", 30)
 
 	// Load configuration from a YAML file
 	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath("./app/config")
+	viper.SetConfigType("yml")
+	if isTest == true {
+		viper.AddConfigPath("../../../app/config/")
+	} else {
+		viper.AddConfigPath("./app/config/")
+	}
+
 	err := viper.ReadInConfig()
 	if err != nil {
 		log.Printf("Unable to read config file: %v", err)

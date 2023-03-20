@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"strings"
+	"toggl/app/config"
 	"toggl/app/dtos"
 	"toggl/app/models"
 	"toggl/app/utils"
@@ -23,23 +24,36 @@ type DeckRepository interface {
 type Repository struct {
 	logger   *logrus.Logger
 	testMode bool
+	config   *config.Config
+}
+
+func setupDb(isTest bool, conf *config.Config) (*sql.DB, error) {
+	var db *sql.DB
+	var err error
+	if isTest {
+		db, err = sql.Open("sqlite3", conf.Database.TestPath)
+		if err != nil {
+			return nil, err
+		}
+		return db, nil
+	}
+	db, err = sql.Open("sqlite3", conf.Database.ProdPath)
+	if err != nil {
+		return nil, err
+	}
+
+	return db, nil
+
 }
 
 // Setup new database repository
-func NewRepository(logger *logrus.Logger, testMode bool) *Repository {
-
-	var db *sql.DB
-	var err error
+func NewRepository(logger *logrus.Logger, testMode bool, config *config.Config) *Repository {
 
 	// open the database
-	if testMode {
-		db, err = sql.Open("sqlite3", "../../../app/db/test.db")
-	} else {
-		db, err = sql.Open("sqlite3", "app/db/deck.db")
-	}
+	db, err := setupDb(testMode, config)
 
 	if err != nil {
-		log.Fatal(err)
+		logger.Error(err)
 	}
 	defer db.Close()
 
@@ -68,21 +82,18 @@ func NewRepository(logger *logrus.Logger, testMode bool) *Repository {
 	if err != nil {
 		log.Fatal(err)
 	}
-	return &Repository{logger: logger, testMode: testMode}
+	return &Repository{logger: logger, testMode: testMode, config: config}
 }
 
 // Create deck
 func (r *Repository) CreateDeck(deck *models.Deck) (string, error) {
 
 	var deckId = utils.Generate_uuid()
-	var db *sql.DB
-	var err error
-
 	// open the database
-	if r.testMode {
-		db, err = sql.Open("sqlite3", "../../../app/db/test.db")
-	} else {
-		db, err = sql.Open("sqlite3", "app/db/deck.db")
+	db, err := setupDb(r.testMode, r.config)
+
+	if err != nil {
+		r.logger.Error(err)
 	}
 
 	defer db.Close()
@@ -134,14 +145,10 @@ func (r *Repository) CreateDeck(deck *models.Deck) (string, error) {
 // Open deck
 func (r *Repository) OpenDeck(deckId string) (*dtos.RespOpenDeck, error) {
 
-	var db *sql.DB
-	var err error
+	db, err := setupDb(r.testMode, r.config)
 
-	// open the database
-	if r.testMode {
-		db, err = sql.Open("sqlite3", "../../../app/db/test.db")
-	} else {
-		db, err = sql.Open("sqlite3", "app/db/deck.db")
+	if err != nil {
+		r.logger.Error(err)
 	}
 
 	defer db.Close()
@@ -195,14 +202,10 @@ func (r *Repository) OpenDeck(deckId string) (*dtos.RespOpenDeck, error) {
 // Check is id exist
 func (r *Repository) CheckDeckExist(deckId string) (bool, error) {
 
-	var db *sql.DB
-	var err error
+	db, err := setupDb(r.testMode, r.config)
 
-	// open the database
-	if r.testMode {
-		db, err = sql.Open("sqlite3", "../../../app/db/test.db")
-	} else {
-		db, err = sql.Open("sqlite3", "app/db/deck.db")
+	if err != nil {
+		r.logger.Error(err)
 	}
 
 	defer db.Close()
@@ -225,14 +228,10 @@ func (r *Repository) CheckDeckExist(deckId string) (bool, error) {
 // draw cards from deck
 func (r *Repository) DrawCard(deckId string, count int) (*dtos.RespDrawDeck, error) {
 
-	var db *sql.DB
-	var err error
+	db, err := setupDb(r.testMode, r.config)
 
-	// open the database
-	if r.testMode {
-		db, err = sql.Open("sqlite3", "../../../app/db/test.db")
-	} else {
-		db, err = sql.Open("sqlite3", "app/db/deck.db")
+	if err != nil {
+		r.logger.Error(err)
 	}
 
 	defer db.Close()

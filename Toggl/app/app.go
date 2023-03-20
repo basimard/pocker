@@ -27,7 +27,7 @@ func NewApp(config *config.Config) (*App, error) {
 
 	logger := logrus.New()
 
-	deckRepo := repos.NewRepository(logger, false)
+	deckRepo := repos.NewRepository(logger, false, config)
 	// Create new services for the app
 	deckService := services.NewDeckService(logger, deckRepo)
 

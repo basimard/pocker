@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"testing"
+	"toggl/app/config"
 	"toggl/app/repos"
 	"toggl/app/services"
 	"toggl/app/utils"
@@ -55,13 +56,23 @@ func createTempDB() (string, error) {
 	return dbPath, nil
 }
 
+func setConfig() (*config.Config, error) {
+
+	var conf, err = config.LoadConfig(true)
+	if err != nil {
+		return nil, err
+	}
+	return conf, nil
+}
+
 func TestCheckIfCreateNewDeckReturnValidDeckId(t *testing.T) {
 
 	// Create a new logger
 	logger := logrus.New()
-
+	conf, err := setConfig()
+	assert.NoError(t, err)
 	// Create a new repository in test mode
-	repo := repos.NewRepository(logger, true)
+	repo := repos.NewRepository(logger, true, conf)
 
 	// Create a new deck service using the repository
 	service := services.NewDeckService(logger, repo)
@@ -85,8 +96,10 @@ func TestCheckIfCreateNewDeckReturnValidRemainingForGivenCards(t *testing.T) {
 	// Create a new logger
 	logger := logrus.New()
 
+	conf, err := setConfig()
+	assert.NoError(t, err)
 	// Create a new repository in test mode
-	repo := repos.NewRepository(logger, true)
+	repo := repos.NewRepository(logger, true, conf)
 
 	// Create a new deck service using the repository
 	service := services.NewDeckService(logger, repo)
@@ -110,17 +123,19 @@ func TestCheckIfCreateNewDeckReturnInValidForInvalidCards(t *testing.T) {
 	// Create a new logger
 	logger := logrus.New()
 
+	conf, err := setConfig()
+	assert.NoError(t, err)
 	// Create a new repository in test mode
-	repo := repos.NewRepository(logger, true)
+	repo := repos.NewRepository(logger, true, conf)
 
 	// Create a new deck service using the repository
 	service := services.NewDeckService(logger, repo)
 
 	// Call the CreateNewDeck method with false for shuffle and an empty string for deckID
-	_, err := service.CreateNewDeck(false, sample)
+	_, errCn := service.CreateNewDeck(false, sample)
 
 	// Ensure that no error was returned
-	assert.EqualError(t, err, "Invalid card")
+	assert.EqualError(t, errCn, "Invalid card")
 
 }
 
@@ -131,8 +146,10 @@ func TestCheckIfCreateNewDeckNonShafulledCardsSameOrder(t *testing.T) {
 	// Create a new logger
 	logger := logrus.New()
 
+	conf, err := setConfig()
+	assert.NoError(t, err)
 	// Create a new repository in test mode
-	repo := repos.NewRepository(logger, true)
+	repo := repos.NewRepository(logger, true, conf)
 
 	// Create a new deck service using the repository
 	service := services.NewDeckService(logger, repo)
@@ -157,8 +174,10 @@ func TestCheckIfCreateNewDeckShafulledCardsDifferetOrder(t *testing.T) {
 	// Create a new logger
 	logger := logrus.New()
 
+	conf, err := setConfig()
+	assert.NoError(t, err)
 	// Create a new repository in test mode
-	repo := repos.NewRepository(logger, true)
+	repo := repos.NewRepository(logger, true, conf)
 
 	// Create a new deck service using the repository
 	service := services.NewDeckService(logger, repo)
@@ -182,17 +201,19 @@ func TestCheckIfCreateNewDeckIfCodeSuitPositionChangeReturnError(t *testing.T) {
 	// Create a new logger
 	logger := logrus.New()
 
+	conf, err := setConfig()
+	assert.NoError(t, err)
 	// Create a new repository in test mode
-	repo := repos.NewRepository(logger, true)
+	repo := repos.NewRepository(logger, true, conf)
 
 	// Create a new deck service using the repository
 	service := services.NewDeckService(logger, repo)
 
 	// Call the CreateNewDeck method with false for shuffle and an empty string for deckID
-	_, err := service.CreateNewDeck(false, sample)
+	_, errCn := service.CreateNewDeck(false, sample)
 
 	// Ensure that no error was returned
-	assert.EqualError(t, err, "Invalid value")
+	assert.EqualError(t, errCn, "Invalid value")
 
 }
 
@@ -205,8 +226,10 @@ func TestCheckIfOpenDeckWithValidIdReturnCorrectData(t *testing.T) {
 	// Create a new logger
 	logger := logrus.New()
 
+	conf, err := setConfig()
+	assert.NoError(t, err)
 	// Create a new repository in test mode
-	repo := repos.NewRepository(logger, true)
+	repo := repos.NewRepository(logger, true, conf)
 
 	// Create a new deck service using the repository
 	service := services.NewDeckService(logger, repo)
@@ -234,17 +257,19 @@ func TestCheckIfOpenDeckWithNonExistIdReturnError(t *testing.T) {
 	// Create a new logger
 	logger := logrus.New()
 
+	conf, err := setConfig()
+	assert.NoError(t, err)
 	// Create a new repository in test mode
-	repo := repos.NewRepository(logger, true)
+	repo := repos.NewRepository(logger, true, conf)
 
 	// Create a new deck service using the repository
 	service := services.NewDeckService(logger, repo)
 
 	// Call the CreateNewDeck method with false for shuffle and an empty string for deckID
-	_, err := service.OpenDeck(sample)
+	_, errOd := service.OpenDeck(sample)
 
 	// Ensure that no error was returned
-	assert.EqualError(t, err, "Id doesn't exist")
+	assert.EqualError(t, errOd, "Id doesn't exist")
 
 }
 
@@ -257,8 +282,10 @@ func TestCheckIfDrawCardWithValidIdReturnSuccess(t *testing.T) {
 	// Create a new logger
 	logger := logrus.New()
 
+	conf, err := setConfig()
+	assert.NoError(t, err)
 	// Create a new repository in test mode
-	repo := repos.NewRepository(logger, true)
+	repo := repos.NewRepository(logger, true, conf)
 
 	// Create a new deck service using the repository
 	service := services.NewDeckService(logger, repo)
@@ -285,18 +312,19 @@ func TestCheckIfDrawnCardWithMoreThanRemainingCountReturnError(t *testing.T) {
 	// Create a new logger
 	logger := logrus.New()
 
+	conf, err := setConfig()
+	assert.NoError(t, err)
 	// Create a new repository in test mode
-	repo := repos.NewRepository(logger, true)
-
+	repo := repos.NewRepository(logger, true, conf)
 	// Create a new deck service using the repository
 	service := services.NewDeckService(logger, repo)
 
 	// Call the CreateNewDeck method with false for shuffle and an empty string for deckID
 	deck, _ := service.CreateNewDeck(shuffled, stringSample)
 	newDeckId := deck.DeckID
-	_, err := service.DrawCard(newDeckId, count)
+	_, errDc := service.DrawCard(newDeckId, count)
 
-	assert.EqualError(t, err, "Requested count exceeds remaining cards in deck")
+	assert.EqualError(t, errDc, "Requested count exceeds remaining cards in deck")
 
 }
 
@@ -306,14 +334,16 @@ func TestCheckIfDrawnCardsNonExisitingIdReturnError(t *testing.T) {
 	// Create a new logger
 	logger := logrus.New()
 
+	conf, err := setConfig()
+	assert.NoError(t, err)
 	// Create a new repository in test mode
-	repo := repos.NewRepository(logger, true)
+	repo := repos.NewRepository(logger, true, conf)
 
 	// Create a new deck service using the repository
 	service := services.NewDeckService(logger, repo)
 
-	_, err := service.DrawCard(sample, count)
+	_, errDc := service.DrawCard(sample, count)
 
-	assert.EqualError(t, err, "Id doesn't exist")
+	assert.EqualError(t, errDc, "Id doesn't exist")
 
 }

@@ -1,3 +1,4 @@
-port: 8080
-database:
-  path: tests/unit/services/test_db.db
+Port: 8080
+Database:
+   TestPath: ../../../app/db/test.db
+   ProdPath: ./app/db/deck.db

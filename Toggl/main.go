@@ -12,7 +12,7 @@ import (
 
 func main() {
 	// Load configuration
-	config, err := config.LoadConfig()
+	config, err := config.LoadConfig(false)
 	if err != nil {
 		log.Fatalf("failed to load config: %s", err)
 	}
