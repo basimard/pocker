@@ -1,4 +1,3 @@
-
 ## API Reference
 Base URL http://localhost:8080
 #### Create a new deck
@@ -44,3 +43,21 @@ Navigate to the root directory of the cloned repository where the file "**main.g
     go run .
 
 
+## Test Handlers
+
+Navigate to the following folder "**toggl/tests/unit/handlers**" where the file "**_test.go**" files located.
+
+**RUN** 
+    
+    
+    go test .
+
+
+## Test Services
+
+Navigate to the following folder "**toggl/tests/unit/services**" where the file "**_test.go**" files located.
+
+**RUN** 
+    
+    
+    go test .
