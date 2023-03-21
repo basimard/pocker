@@ -1,10 +1,10 @@
 package services
 
 import (
+	"crypto/rand"
 	"errors"
-	"math/rand"
+	"math/big"
 	"strings"
-	"time"
 	"toggl/app/dtos"
 	"toggl/app/models"
 	"toggl/app/repos"
@@ -116,11 +116,8 @@ func (s *DeckServiceImpl) CreateNewDeck(shuffled bool, cards string) (*dtos.Resp
 		deckCards = CreateFullDeck()
 	}
 
-	rand.Seed(time.Now().UnixNano())
 	if shuffled == true {
-		rand.Shuffle(len(deckCards), func(i, j int) {
-			deckCards[i], deckCards[j] = deckCards[j], deckCards[i]
-		})
+		deckCards = shuffleCards(deckCards)
 	}
 
 	deck := &models.Deck{
@@ -137,6 +134,19 @@ func (s *DeckServiceImpl) CreateNewDeck(shuffled bool, cards string) (*dtos.Resp
 	var resp = dtos.RespCreateDeck{DeckID: result, Remaining: deck.Remaining, Shuffled: deck.Shuffled}
 
 	return &resp, nil
+}
+
+// shuffle the cards
+func shuffleCards(deck []models.Card) []models.Card {
+	n := len(deck)
+	for i := n - 1; i > 0; i-- {
+		j, err := rand.Int(rand.Reader, big.NewInt(int64(i+1)))
+		if err != nil {
+			panic(err)
+		}
+		deck[i], deck[j.Int64()] = deck[j.Int64()], deck[i]
+	}
+	return deck
 }
 
 // open a new deck based on id

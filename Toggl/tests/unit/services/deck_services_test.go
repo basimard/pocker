@@ -77,7 +77,7 @@ func TestCheckIfCreateNewDeckReturnValidDeckId(t *testing.T) {
 	// Create a new deck service using the repository
 	service := services.NewDeckService(logger, repo)
 
-	// Call the CreateNewDeck method with false for shuffle and an empty string for deckID
+	// Call the CreateNewDeck method with false for shuffle
 	deck, err := service.CreateNewDeck(false, "")
 
 	// Ensure that no error was returned
@@ -104,7 +104,7 @@ func TestCheckIfCreateNewDeckReturnValidRemainingForGivenCards(t *testing.T) {
 	// Create a new deck service using the repository
 	service := services.NewDeckService(logger, repo)
 
-	// Call the CreateNewDeck method with false for shuffle and an empty string for deckID
+	// Call the CreateNewDeck method with false for shuffle
 	deck, err := service.CreateNewDeck(false, sample)
 
 	// Ensure that no error was returned
@@ -131,7 +131,7 @@ func TestCheckIfCreateNewDeckReturnInValidForInvalidCards(t *testing.T) {
 	// Create a new deck service using the repository
 	service := services.NewDeckService(logger, repo)
 
-	// Call the CreateNewDeck method with false for shuffle and an empty string for deckID
+	// Call the CreateNewDeck method with false for shuffle
 	_, errCn := service.CreateNewDeck(false, sample)
 
 	// Ensure that no error was returned
@@ -139,7 +139,7 @@ func TestCheckIfCreateNewDeckReturnInValidForInvalidCards(t *testing.T) {
 
 }
 
-func TestCheckIfCreateNewDeckNonShafulledCardsSameOrder(t *testing.T) {
+func TestCheckIfCreateNewDeckNonShufulledCardsSameOrder(t *testing.T) {
 	var stringSample = "AS,2S,3S,4S"
 	var sample = []string{"AS", "2S", "3S", "4S"}
 
@@ -154,7 +154,7 @@ func TestCheckIfCreateNewDeckNonShafulledCardsSameOrder(t *testing.T) {
 	// Create a new deck service using the repository
 	service := services.NewDeckService(logger, repo)
 
-	// Call the CreateNewDeck method with false for shuffle and an empty string for deckID
+	// Call the CreateNewDeck method with false for shuffle
 	deck, _ := service.CreateNewDeck(false, stringSample)
 
 	deckOpend, _ := service.OpenDeck(deck.DeckID)
@@ -167,7 +167,7 @@ func TestCheckIfCreateNewDeckNonShafulledCardsSameOrder(t *testing.T) {
 
 }
 
-func TestCheckIfCreateNewDeckShafulledCardsDifferetOrder(t *testing.T) {
+func TestCheckIfCreateNewDeckShufulledCardsDifferetOrder(t *testing.T) {
 	var stringSample = "AS,2S"
 	var sample = []string{"AS", "2S"}
 	var shuffled = true
@@ -182,7 +182,7 @@ func TestCheckIfCreateNewDeckShafulledCardsDifferetOrder(t *testing.T) {
 	// Create a new deck service using the repository
 	service := services.NewDeckService(logger, repo)
 
-	// Call the CreateNewDeck method with false for shuffle and an empty string for deckID
+	// Call the CreateNewDeck method with true for shuffle
 	deck, _ := service.CreateNewDeck(shuffled, stringSample)
 
 	deckOpend, _ := service.OpenDeck(deck.DeckID)
@@ -209,7 +209,7 @@ func TestCheckIfCreateNewDeckIfCodeSuitPositionChangeReturnError(t *testing.T) {
 	// Create a new deck service using the repository
 	service := services.NewDeckService(logger, repo)
 
-	// Call the CreateNewDeck method with false for shuffle and an empty string for deckID
+	// Call the CreateNewDeck method with false for shuffle
 	_, errCn := service.CreateNewDeck(false, sample)
 
 	// Ensure that no error was returned
@@ -234,7 +234,7 @@ func TestCheckIfOpenDeckWithValidIdReturnCorrectData(t *testing.T) {
 	// Create a new deck service using the repository
 	service := services.NewDeckService(logger, repo)
 
-	// Call the CreateNewDeck method with false for shuffle and an empty string for deckID
+	// Call the CreateNewDeck method with false for shuffle
 	deck, _ := service.CreateNewDeck(shuffled, stringSample)
 	newDeckId := deck.DeckID
 	deckOpend, _ := service.OpenDeck(newDeckId)
@@ -265,7 +265,7 @@ func TestCheckIfOpenDeckWithNonExistIdReturnError(t *testing.T) {
 	// Create a new deck service using the repository
 	service := services.NewDeckService(logger, repo)
 
-	// Call the CreateNewDeck method with false for shuffle and an empty string for deckID
+	// Call the CreateNewDeck method with false for shuffle
 	_, errOd := service.OpenDeck(sample)
 
 	// Ensure that no error was returned
@@ -290,7 +290,7 @@ func TestCheckIfDrawCardWithValidIdReturnSuccess(t *testing.T) {
 	// Create a new deck service using the repository
 	service := services.NewDeckService(logger, repo)
 
-	// Call the CreateNewDeck method with false for shuffle and an empty string for deckID
+	// Call the CreateNewDeck method with false for shuffle
 	deck, _ := service.CreateNewDeck(shuffled, stringSample)
 	newDeckId := deck.DeckID
 	drawnCards, _ := service.DrawCard(newDeckId, count)
@@ -319,7 +319,7 @@ func TestCheckIfDrawnCardWithMoreThanRemainingCountReturnError(t *testing.T) {
 	// Create a new deck service using the repository
 	service := services.NewDeckService(logger, repo)
 
-	// Call the CreateNewDeck method with false for shuffle and an empty string for deckID
+	// Call the CreateNewDeck method with false for shuffle
 	deck, _ := service.CreateNewDeck(shuffled, stringSample)
 	newDeckId := deck.DeckID
 	_, errDc := service.DrawCard(newDeckId, count)
